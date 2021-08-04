@@ -12,7 +12,7 @@ stages {
 
       // Get some code from a GitHub repository
 
-   //  git 'https://github.com/raknas999/GOL-Repo.git'
+   //  git 'https://github.com/sumanthsainooka/GOL-Repo.git'
 
       // Get the Maven tool.
      
@@ -41,20 +41,7 @@ stages {
       
       }
  }
-  stage('Sonarqube') {
-    environment {
-        scannerHome = tool 'sonarqube'
-    }
-    steps {
-        withSonarQubeEnv('sonarqube') {
-            sh "${scannerHome}/bin/sonar-scanner"
-            
-        }
-    //    timeout(time: 10, unit: 'MINUTES') {
-    //      waitForQualityGate abortPipeline: true
-    //    }
-    }
-}
+  
      stage('Artifact upload') {
       steps {
      nexusPublisher nexusInstanceId: '1234', nexusRepositoryId: 'releases', packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: 'gameoflife-web/target/gameoflife.war']], mavenCoordinate: [artifactId: 'gameoflife', groupId: 'com.wakaleo.gameoflife', packaging: 'war', version: '$BUILD_NUMBER']]]
@@ -62,9 +49,9 @@ stages {
  }
     stage('Deploy War') {
       steps {
-          //deploy adapters: [tomcat8(credentialsId: 'tomcat-cred', path: '', url: 'http://18.220.134.203:8080/')], contextPath: null, war: '**/*.war'
-          sh label: '', script: 'ansible-playbook deploy-withinfra.yml'
-          //sh label: '', script: 'ansible-playbook deploy.yml'
+          //deploy adapters: [tomcat8(credentialsId: 'tomcat-cred', path: '', url: 'http://172.31.11.23:8080/')], contextPath: null, war: '**/*.war'
+          //sh label: '', script: 'ansible-playbook deploy-withinfra.yml'
+          sh label: '', script: 'ansible-playbook deploy.yml'
       }
  }
 }
@@ -73,7 +60,7 @@ post {
             archiveArtifacts 'gameoflife-web/target/*.war'
         }
         failure {
-            mail to:"raknas000@gmail.com", subject:"FAILURE: ${currentBuild.fullDisplayName}", body: "Build failed"
+            mail to:"sumanthsainooka@gmail.com", subject:"FAILURE: ${currentBuild.fullDisplayName}", body: "Build failed"
         }
     }       
 }
